@@ -1,6 +1,6 @@
 {
   "name": "flexi-quotation",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Smart Rental - Flexi Quotation Generator",
   "main": "main.js",
   "scripts": {
