@@ -1,0 +1,56 @@
+{
+  "name": "flexi-quotation",
+  "version": "1.0.0",
+  "description": "Smart Rental - Flexi Quotation Generator",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "asia.smartrental.flexi-quotation",
+    "productName": "Flexi Quotation",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "extraResources": [
+      {
+        "from": "../laravel",
+        "to": "laravel",
+        "filter": [
+          "**/*",
+          "!node_modules",
+          "!.git",
+          "!storage/**",
+          "!database/database.sqlite"
+        ]
+      },
+      {
+        "from": "php",
+        "to": "php"
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false,
+      "installerLanguages": [
+        "en_US"
+      ],
+      "perMachine": false
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "onetynine",
+      "repo": "flexi-quotation"
+    }
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron-updater": "^6.8.3"
+  }
+}
