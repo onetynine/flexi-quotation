@@ -91,6 +91,10 @@ function quotationForm(plans, existing) {
         planName: existing ? existing.plan_name : '',
         planSpecs: existing ? (existing.plan_specs || '') : '',
         ratePerDay: existing ? parseFloat(existing.rate_per_day) : 0,
+        rateType: existing ? (existing.rate_type || 'daily') : 'daily',
+        planDailyRate: 0,
+        planWeeklyRate: 0,
+        planMonthlyRate: 0,
         depositOption: existing ? existing.deposit_option : 'standard',
         depositAmount: existing ? parseFloat(existing.deposit_amount) : 0,
         standardDepositPerUnit: 0,
@@ -108,11 +112,15 @@ function quotationForm(plans, existing) {
         init() {
             if (this.planId) {
                 const plan = this.plans.find(p => p.id == this.planId);
-                if (plan) this.standardDepositPerUnit = plan.deposit_per_unit;
+                if (plan) {
+                    this.standardDepositPerUnit = plan.deposit_per_unit;
+                    this.planDailyRate   = plan.daily_rate;
+                    this.planWeeklyRate  = plan.weekly_rate;
+                    this.planMonthlyRate = plan.monthly_rate;
+                }
             }
             this.$watch('startDate', () => this.calculate());
             this.$watch('endDate', () => this.calculate());
-            // pre-fill customer fields from existing quotation
             if (existing) {
                 this.$nextTick(() => {
                     const cp = document.querySelector('[x-data*="customerPicker"]')?._x_dataStack?.[0];
@@ -127,14 +135,28 @@ function quotationForm(plans, existing) {
             return new Date(+p[0], +p[1] - 1, +p[2]);
         },
 
+        rateForType() {
+            if (this.rateType === 'weekly')  return this.planWeeklyRate;
+            if (this.rateType === 'monthly') return this.planMonthlyRate;
+            return this.planDailyRate;
+        },
+
+        changeRateType() {
+            if (!this.isCustomPlan) this.ratePerDay = this.rateForType();
+            this.calculate();
+        },
+
         selectPlan() {
             const plan = this.plans.find(p => p.id == this.planId);
             if (!plan) return;
             this.isCustomPlan = plan.is_custom;
             if (!plan.is_custom) {
-                this.planName = plan.name;
-                this.planSpecs = plan.specs || '';
-                this.ratePerDay = plan.daily_rate;
+                this.planName        = plan.name;
+                this.planSpecs       = plan.specs || '';
+                this.planDailyRate   = plan.daily_rate;
+                this.planWeeklyRate  = plan.weekly_rate;
+                this.planMonthlyRate = plan.monthly_rate;
+                this.ratePerDay      = this.rateForType();
                 this.standardDepositPerUnit = plan.deposit_per_unit;
                 if (this.depositOption === 'standard') {
                     this.depositAmount = plan.deposit_per_unit * this.quantity;
@@ -142,6 +164,7 @@ function quotationForm(plans, existing) {
             } else {
                 this.planName = '';
                 this.planSpecs = '';
+                this.planDailyRate = this.planWeeklyRate = this.planMonthlyRate = 0;
                 this.ratePerDay = 0;
                 this.standardDepositPerUnit = 0;
             }
@@ -155,6 +178,12 @@ function quotationForm(plans, existing) {
             this.calculate();
         },
 
+        billingUnits() {
+            if (this.rateType === 'weekly')  return Math.ceil(this.totalDays / 7);
+            if (this.rateType === 'monthly') return Math.ceil(this.totalDays / 30);
+            return this.totalDays;
+        },
+
         calculate() {
             const s = this.parseDate(this.startDate);
             const e = this.parseDate(this.endDate);
@@ -165,7 +194,7 @@ function quotationForm(plans, existing) {
             }
             const delivery = parseFloat(this.deliveryFee || 0);
             const deposit  = parseFloat(this.depositAmount || 0);
-            this.rentalFee    = Math.round(this.ratePerDay * this.quantity * this.totalDays * 100) / 100;
+            this.rentalFee    = Math.round(this.ratePerDay * this.quantity * this.billingUnits() * 100) / 100;
             this.subtotal     = Math.round((this.rentalFee + delivery) * 100) / 100;
             this.taxAmount    = Math.round(this.subtotal * (this.taxPercent / 100) * 100) / 100;
             this.totalPayable = Math.round((this.subtotal + this.taxAmount + deposit) * 100) / 100;

@@ -1,6 +1,6 @@
 {
   "name": "flexi-quotation",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Smart Rental - Flexi Quotation Generator",
   "main": "main.js",
   "scripts": {
@@ -37,7 +37,8 @@
       "installerLanguages": [
         "en_US"
       ],
-      "perMachine": false
+      "perMachine": false,
+      "include": "installer.nsh"
     },
     "publish": {
       "provider": "github",

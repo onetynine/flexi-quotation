@@ -11,7 +11,7 @@ class Quotation extends Model
         'plan_id', 'plan_name', 'plan_specs', 'is_custom_plan', 'quantity',
         'start_date', 'end_date', 'total_days',
         'delivery_option', 'delivery_fee',
-        'rate_per_day', 'rental_fee', 'deposit_option', 'deposit_amount',
+        'rate_per_day', 'rate_type', 'rental_fee', 'deposit_option', 'deposit_amount',
         'tax_percent', 'tax_amount', 'subtotal', 'total_payable',
         'agent_name', 'agent_contact', 'agent_email',
         'quotation_link', 'status',

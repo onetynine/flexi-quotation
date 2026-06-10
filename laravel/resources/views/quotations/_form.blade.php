@@ -134,7 +134,7 @@
             <input type="hidden" name="plan_specs" :value="planSpecs">
             <input type="hidden" name="is_custom_plan" :value="isCustomPlan ? '1' : '0'">
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantity <span class="text-red-500">*</span></label>
                     <input type="number" name="quantity" min="1" x-model.number="quantity"
@@ -142,7 +142,19 @@
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Rate / Day (RM) <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Rate Type <span class="text-red-500">*</span></label>
+                    <select x-model="rateType" @change="changeRateType()"
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 outline-none">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                    <input type="hidden" name="rate_type" :value="rateType">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Rate / <span x-text="rateType === 'weekly' ? 'Week' : rateType === 'monthly' ? 'Month' : 'Day'"></span> (RM) <span class="text-red-500">*</span>
+                    </label>
                     <input type="number" name="rate_per_day" step="0.01" min="0"
                            x-model.number="ratePerDay" @input="calculate()"
                            :readonly="!isCustomPlan" :class="!isCustomPlan ? 'bg-gray-50 text-gray-600' : ''"
@@ -230,7 +242,7 @@
 
         <div class="bg-gray-50 rounded-lg p-4 text-sm space-y-2">
             <div class="flex justify-between">
-                <span class="text-gray-600">Rental Fee (<span x-text="ratePerDay"></span>/day × <span x-text="quantity"></span> units × <span x-text="totalDays"></span> days)</span>
+                <span class="text-gray-600">Rental Fee (<span x-text="ratePerDay"></span>/<span x-text="rateType === 'weekly' ? 'week' : rateType === 'monthly' ? 'month' : 'day'"></span> × <span x-text="quantity"></span> units × <span x-text="rateType === 'weekly' ? Math.ceil(totalDays/7) : rateType === 'monthly' ? Math.ceil(totalDays/30) : totalDays"></span> <span x-text="rateType === 'weekly' ? 'weeks' : rateType === 'monthly' ? 'months' : 'days'"></span>)</span>
                 <span class="font-medium" x-text="fmt(rentalFee)"></span>
             </div>
             <div class="flex justify-between">

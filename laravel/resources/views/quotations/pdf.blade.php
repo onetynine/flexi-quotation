@@ -135,7 +135,7 @@
     <div class="fin-wrap">
         <table class="fin-table">
             <tr>
-                <td class="fin-label">Rental Fee <em>(Rate {{ number_format($quotation->rate_per_day, 2) }} / day)</em></td>
+                <td class="fin-label">Rental Fee <em>(Rate {{ number_format($quotation->rate_per_day, 2) }} / {{ $quotation->rate_type === 'weekly' ? 'week' : ($quotation->rate_type === 'monthly' ? 'month' : 'day') }})</em></td>
                 <td class="fin-value">RM {{ number_format($quotation->rental_fee, 2) }}</td>
             </tr>
             <tr>

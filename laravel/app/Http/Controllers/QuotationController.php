@@ -42,6 +42,7 @@ class QuotationController extends Controller
             'delivery_option'  => 'required|string|max:100',
             'delivery_fee'     => 'required|numeric|min:0',
             'rate_per_day'     => 'required|numeric|min:0',
+            'rate_type'        => 'required|in:daily,weekly,monthly',
             'deposit_option'   => 'required|string',
             'deposit_amount'   => 'required|numeric|min:0',
             'tax_percent'      => 'required|numeric|min:0',
@@ -54,8 +55,13 @@ class QuotationController extends Controller
 
         $start = Carbon::parse($data['start_date']);
         $end   = Carbon::parse($data['end_date']);
-        $totalDays  = $start->diffInDays($end) + 1;
-        $rentalFee  = round($data['rate_per_day'] * $data['quantity'] * $totalDays, 2);
+        $totalDays    = $start->diffInDays($end) + 1;
+        $billingUnits = match($data['rate_type']) {
+            'weekly'  => (int) ceil($totalDays / 7),
+            'monthly' => (int) ceil($totalDays / 30),
+            default   => $totalDays,
+        };
+        $rentalFee  = round($data['rate_per_day'] * $data['quantity'] * $billingUnits, 2);
         $subtotal   = round($rentalFee + $data['delivery_fee'], 2);
         $taxAmount  = round($subtotal * ($data['tax_percent'] / 100), 2);
         $total      = round($subtotal + $taxAmount + $data['deposit_amount'], 2);
@@ -103,6 +109,7 @@ class QuotationController extends Controller
             'delivery_option'  => 'required|string|max:100',
             'delivery_fee'     => 'required|numeric|min:0',
             'rate_per_day'     => 'required|numeric|min:0',
+            'rate_type'        => 'required|in:daily,weekly,monthly',
             'deposit_option'   => 'required|string',
             'deposit_amount'   => 'required|numeric|min:0',
             'tax_percent'      => 'required|numeric|min:0',
@@ -115,8 +122,13 @@ class QuotationController extends Controller
 
         $start = Carbon::parse($data['start_date']);
         $end   = Carbon::parse($data['end_date']);
-        $totalDays  = $start->diffInDays($end) + 1;
-        $rentalFee  = round($data['rate_per_day'] * $data['quantity'] * $totalDays, 2);
+        $totalDays    = $start->diffInDays($end) + 1;
+        $billingUnits = match($data['rate_type']) {
+            'weekly'  => (int) ceil($totalDays / 7),
+            'monthly' => (int) ceil($totalDays / 30),
+            default   => $totalDays,
+        };
+        $rentalFee  = round($data['rate_per_day'] * $data['quantity'] * $billingUnits, 2);
         $subtotal   = round($rentalFee + $data['delivery_fee'], 2);
         $taxAmount  = round($subtotal * ($data['tax_percent'] / 100), 2);
         $total      = round($subtotal + $taxAmount + $data['deposit_amount'], 2);
