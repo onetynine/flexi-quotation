@@ -20,8 +20,23 @@ $app = Application::configure(basePath: dirname(__DIR__))
         );
     })->create();
 
-$storagePath = getenv('APP_STORAGE_PATH') ?: ($_SERVER['APP_STORAGE_PATH'] ?? null);
+$storagePath = getenv('APP_STORAGE_PATH')
+    ?: ($_SERVER['APP_STORAGE_PATH'] ?? null)
+    ?: ($_ENV['APP_STORAGE_PATH'] ?? null);
+
+// Fallback: derive from Windows APPDATA (always set, doesn't depend on env passing)
+if (!$storagePath) {
+    $appData = getenv('APPDATA') ?: ($_SERVER['APPDATA'] ?? null);
+    if ($appData) {
+        $storagePath = $appData . DIRECTORY_SEPARATOR . 'flexi-quotation' . DIRECTORY_SEPARATOR . 'storage';
+    }
+}
+
 if ($storagePath) {
+    // Ensure critical dirs exist even if Electron's ensureStorage didn't run
+    foreach (['framework/views', 'framework/cache/data', 'framework/sessions', 'logs', 'fonts', 'app'] as $dir) {
+        @mkdir($storagePath . DIRECTORY_SEPARATOR . $dir, 0755, true);
+    }
     $app->useStoragePath($storagePath);
 }
 
