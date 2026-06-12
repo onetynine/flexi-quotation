@@ -75,7 +75,7 @@ function getStoragePath() {
 }
 
 function ensureStorage(storagePath) {
-    for (const dir of ['app', 'framework/cache', 'framework/sessions', 'framework/views', 'logs']) {
+    for (const dir of ['app', 'framework/cache/data', 'framework/sessions', 'framework/views', 'logs', 'fonts']) {
         fs.mkdirSync(path.join(storagePath, dir), { recursive: true });
     }
 }
