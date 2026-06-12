@@ -22,7 +22,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
 $storagePath = getenv('APP_STORAGE_PATH')
     ?: ($_SERVER['APP_STORAGE_PATH'] ?? null)
-    ?: ($_ENV['APP_STORAGE_PATH'] ?? null);
+    ?: ($_ENV['APP_STORAGE_PATH'] ?? null)
+    ?: (ini_get('flexi.storage') ?: null);
 
 // Fallback: derive from Windows APPDATA (always set, doesn't depend on env passing)
 if (!$storagePath) {

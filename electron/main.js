@@ -89,8 +89,15 @@ function phpEnv(dbPath, machineCode, storagePath) {
     };
 }
 
+function phpIniArgs(storagePath, dbPath) {
+    return [
+        '-d', `flexi.storage=${storagePath}`,
+        '-d', `flexi.db=${dbPath}`,
+    ];
+}
+
 function runMigrations(php, laravelPath, dbPath, machineCode, storagePath) {
-    execFileSync(php, ['artisan', 'migrate', '--force'], {
+    execFileSync(php, [...phpIniArgs(storagePath, dbPath), 'artisan', 'migrate', '--force'], {
         cwd: laravelPath,
         env: phpEnv(dbPath, machineCode, storagePath),
         windowsHide: true,
@@ -99,7 +106,7 @@ function runMigrations(php, laravelPath, dbPath, machineCode, storagePath) {
 }
 
 function startPhpServer(php, laravelPath, dbPath, machineCode, storagePath) {
-    phpProcess = spawn(php, ['artisan', 'serve', `--port=${PORT}`, '--host=127.0.0.1'], {
+    phpProcess = spawn(php, [...phpIniArgs(storagePath, dbPath), 'artisan', 'serve', `--port=${PORT}`, '--host=127.0.0.1'], {
         cwd: laravelPath,
         env: phpEnv(dbPath, machineCode, storagePath),
         windowsHide: true,
